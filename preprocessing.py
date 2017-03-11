@@ -31,7 +31,6 @@ df = pd.read_csv(input_file_name, names=columns_names)
 #df = pd.read_csv("Data/gas_stations_database--fixed_date.csv", names=columns_names)
 
 
-f_normalize = True
 if f_normalize:
 	max_amount = df['AMOUNT'].max()
 	df['AMOUNT'] = df['AMOUNT']/max_amount
@@ -92,8 +91,10 @@ quarterly_grouped = quarterly_grouped.sort_values(['ID', 'YEAR', 'QUARTER'], asc
 if not exists(output_file_path):
 	makedirs(output_file_path)
 
+file_end = "-normalized.csv" if f_normalize else ".csv"
+
 # Saves both generated dataframes into .csv files
-monthly_grouped.to_csv(output_file_path+"monthly_grouped.csv", index=False, header=True)
-quarterly_grouped.to_csv(output_file_path+"quartely_grouped.csv", index=False, header=True)
+monthly_grouped.to_csv(output_file_path+"monthly_grouped"+file_end, index=False, header=True)
+quarterly_grouped.to_csv(output_file_path+"quartely_grouped"+file_end, index=False, header=True)
 
 print "\nSuccessfully finished!"
