@@ -8,6 +8,7 @@
 #
 #########################################################################################
 
+
 # Imports necessary libraries
 import sys
 import pandas as pd
@@ -37,17 +38,17 @@ if f_normalize:
 
 
 # Maps fuel types to numbers
-df['FUEL_TYPE'][df['FUEL_TYPE'] == 'GASOLINAESPECIAL'] = 1
-df['FUEL_TYPE'][df['FUEL_TYPE'] == 'GASNATURALVEHICULAR'] = 2
-df['FUEL_TYPE'][df['FUEL_TYPE'] == 'GASOLINAPREMIUM'] = 3
-df['FUEL_TYPE'][df['FUEL_TYPE'] == 'DIESELOIL'] = 4
+df['FUEL_TYPE'].loc[df['FUEL_TYPE'] == 'GASOLINAESPECIAL'] = 1
+df['FUEL_TYPE'].loc[df['FUEL_TYPE'] == 'GASNATURALVEHICULAR'] = 2
+df['FUEL_TYPE'].loc[df['FUEL_TYPE'] == 'GASOLINAPREMIUM'] = 3
+df['FUEL_TYPE'].loc[df['FUEL_TYPE'] == 'DIESELOIL'] = 4
 
 # Creates a quarter column
 df['QUARTER'] = 0
-df['QUARTER'][df['MONTH'] == 1] = df['QUARTER'][df['MONTH'] == 2] = df['QUARTER'][df['MONTH'] == 3] = 1
-df['QUARTER'][df['MONTH'] == 4] = df['QUARTER'][df['MONTH'] == 5] = df['QUARTER'][df['MONTH'] == 6] = 2
-df['QUARTER'][df['MONTH'] == 7] = df['QUARTER'][df['MONTH'] == 8] = df['QUARTER'][df['MONTH'] == 9] = 3
-df['QUARTER'][df['MONTH'] == 10] = df['QUARTER'][df['MONTH'] == 11] = df['QUARTER'][df['MONTH'] == 12] = 4
+df['QUARTER'].loc[df['MONTH'] == 1] = df['QUARTER'].loc[df['MONTH'] == 2] = df['QUARTER'].loc[df['MONTH'] == 3] = 1
+df['QUARTER'].loc[df['MONTH'] == 4] = df['QUARTER'].loc[df['MONTH'] == 5] = df['QUARTER'].loc[df['MONTH'] == 6] = 2
+df['QUARTER'].loc[df['MONTH'] == 7] = df['QUARTER'].loc[df['MONTH'] == 8] = df['QUARTER'].loc[df['MONTH'] == 9] = 3
+df['QUARTER'].loc[df['MONTH'] == 10] = df['QUARTER'].loc[df['MONTH'] == 11] = df['QUARTER'].loc[df['MONTH'] == 12] = 4
 
 # Creates a frequency column
 df['FREQUENCY'] = 1
@@ -94,3 +95,5 @@ if not exists(output_file_path):
 # Saves both generated dataframes into .csv files
 monthly_grouped.to_csv(output_file_path+"monthly_grouped.csv", index=False, header=True)
 quarterly_grouped.to_csv(output_file_path+"quartely_grouped.csv", index=False, header=True)
+
+print "\nSuccessfully finished!"
