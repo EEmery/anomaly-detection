@@ -1,3 +1,13 @@
+#########################################################################################
+#
+# Replaces semicolon by comas and outputs the result in a proper .csv file.
+#
+# USAGE:   $python fix-csv-file.py [input file].csv [output file]
+# FLAGS:   --date (changes date format from DATE/DATE/DATE to DATE,DATE,DATE)
+#
+#########################################################################################
+
+
 import sys
 
 
