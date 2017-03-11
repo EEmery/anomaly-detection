@@ -25,7 +25,7 @@ def fix_csv_file(input_file_name, output_file_name, fix_date, fix_NaN):
 
 		# Fixes last comma problem
 		if fix_NaN:
-			fixed_line = fixed_line[:-2] + '\n'
+			fixed_line = fixed_line[:fixed_line.rfind(',')] + '\n'
 
 		# Write line to final file
 		output_file.write(fixed_line)
