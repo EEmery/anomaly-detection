@@ -41,6 +41,7 @@ ID | YEAR | QUARTER | FUEL_TYPE | AMOUNT | FREQUENCY | MEAN | STD
 
 Where:
 
+| Column    | Meaning                                                    |
 |---------- | ---------------------------------------------------------- |
 | ID        | License plate                                              |
 | YEAR      | Year of refuel                                             |
