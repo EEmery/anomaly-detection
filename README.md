@@ -54,10 +54,10 @@ Where:
 | STD       | Standard deviation of refuel amount (monthly or quarterly) |
 
 _Note: Fuel type can be:_
-GASOLINAESPECIAL: 1
-GASNATURALVEHICULAR: 2
-GASOLINAPREMIUM: 3
-DIESELOIL: 4
+GASOLINAESPECIAL: 1  
+GASNATURALVEHICULAR: 2  
+GASOLINAPREMIUM: 3  
+DIESELOIL: 4  
 
 The program also offers an option to normalize the refuel amount (AMOUNT) with respect to the maximum refuel amount in the input `.csv` file (use `--norm`). The mean and standard deviation are calculated using the normalized values.
 
