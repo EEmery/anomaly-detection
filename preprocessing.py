@@ -2,56 +2,65 @@
 #
 # Preprocesses data.
 #
-# USAGE:   $python preprocessing.py [input file name]
-# OPTIONS: $python preprocessin.py [input file name] [output file path]
-# FLAGS:   --norm (normalizes the fuel amount)
+# USAGE:   $python preprocessing.py
+# OPTIONS: [input file name]
+#          [output files path]
+# 		   $python preprocessing.py  [input file name] [output files path]
 #
 #########################################################################################
 
 
 # Imports necessary libraries
+print "Importing packages\n"
 import sys
 import pandas as pd
 from os import makedirs
 from os.path import exists
+from warnings import filterwarnings
+from numpy import mean, array
 
+# Filters warnings
+filterwarnings("ignore")
+
+print "Starting preprocessing\n"
+
+
+########################## COMMAND PROMPT AND FILE PATHS SETUP ##########################
 
 # Reads the prompt passed arguments
 sys_input = sys.argv
-f_normalize = True if ("--norm" in sys_input) else False
-input_file_name = sys_input[1]
-output_file_path = "output/"
-if (len(sys_input) == 3 and not "--norm" in sys_input) or len(sys_input) == 4:
-	output_file_path = sys_input[2] if (sys_input[2][-1] == '/') else sys_input[2] + '/'
+input_file_name = "Data/gas_stations-fixed.csv" if len(sys_input) < 2 else sys_input[1]
+output_file_path = "Data/preprocessed/" if len(sys_input) < 3 else sys_input[2]
 
+# Sanitizes output path
+output_file_path += "/" if (output_file_path[-1] == "/") else ""
+
+# Creates output folder path if it does not exists
+if not exists(output_file_path):
+	makedirs(output_file_path)
 
 # Loads the data from the .csv file
 columns_names = ["CITY", "GAS_STATION", "ID", "FUEL_TYPE", "AMOUNT", "DAY", "MONTH", "YEAR"]
 df = pd.read_csv(input_file_name, names=columns_names)
-#df = pd.read_csv("Data/gas_stations_database--fixed_date.csv", names=columns_names)
 
 
-if f_normalize:
-	max_amount = df['AMOUNT'].max()
-	df['AMOUNT'] = df['AMOUNT']/max_amount
+####################### MAKES NECESSARY CHANGES IN THE DATA FRAME #######################
 
+# Normalizes the fuel consuption
+max_amount = df['AMOUNT'].max()
+df['AMOUNT'] = df['AMOUNT']/max_amount
 
-
+# Creates a week column
+df['WEEK'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']]).apply(lambda x: x.week)
 
 # Creates a quarter column
-df['QUARTER'] = 0
-df['QUARTER'].loc[(df['MONTH'] >= 1) & (df['MONTH'] <= 3)] = 1
-df['QUARTER'].loc[(df['MONTH'] >= 4) & (df['MONTH'] <= 6)] = 2
-df['QUARTER'].loc[(df['MONTH'] >= 7) & (df['MONTH'] <= 9)] = 3
-df['QUARTER'].loc[(df['MONTH'] >= 10) & (df['MONTH'] <= 12)] = 4
+df['QUARTER'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']]).apply(lambda x: x.quarter)
 
+# Creates a semester column
+df['SEMESTER'] = df['MONTH'].apply(lambda x: 1 if (x < 7) else 2)
 
-# Maps fuel types to numbers
-#df['FUEL_TYPE'].loc[df['FUEL_TYPE'] == 'GASOLINAESPECIAL'] = 1
-#df['FUEL_TYPE'].loc[df['FUEL_TYPE'] == 'GASNATURALVEHICULAR'] = 2
-#df['FUEL_TYPE'].loc[df['FUEL_TYPE'] == 'GASOLINAPREMIUM'] = 3
-#df['FUEL_TYPE'].loc[df['FUEL_TYPE'] == 'DIESELOIL'] = 4
-
+# Creates a frequency column
+df['FREQUENCY'] = 1
 
 # Creates a column for each fuel
 df['GE'] = df['AMOUNT'].loc[df['FUEL_TYPE'] == 'GASOLINAESPECIAL']
@@ -59,64 +68,50 @@ df['GNV'] = df['AMOUNT'].loc[df['FUEL_TYPE'] == 'GASNATURALVEHICULAR']
 df['GP'] = df['AMOUNT'].loc[df['FUEL_TYPE'] == 'GASOLINAPREMIUM']
 df['DO'] = df['AMOUNT'].loc[df['FUEL_TYPE'] == 'DIESELOIL']
 
-# Creates a frequency column
-df['FREQUENCY'] = 1
 
+####################### PROCESS DATAFRAME IN RELATION TO PERIODS ########################
 
-################################### MONTHLY GROUPING ####################################
+periods = ['WEEK', 'MONTH', 'QUARTER', 'SEMESTER']
+messages_to_print = ['weekly', 'monthly', 'quarterly', 'semesterly']
+columns_to_clean = ['AMOUNT', 'DAY', 'WEEK', 'MONTH', 'QUARTER', 'SEMESTER']
 
-# Groups ID's fuel consuption by month
-monthly_grouped = df.groupby(['ID', 'YEAR', 'MONTH'], as_index=False).sum()
+for period, message in zip(periods, messages_to_print):
 
-# Calculates the mean of the first half of the month
-#monthly_grouped['HALF_1'] = df['AMOUNT'].loc(df)
+	print "Starting " + message + " analysis"
 
-# Calculates monthly mean
-monthly_grouped['MEAN'] = df.groupby(['ID', 'YEAR', 'MONTH'], as_index=False).mean()['AMOUNT']
+	# Groups ID's fuel consuption by month
+	grouping_cols = ['ID', 'YEAR'] + [period]
+	grouped = df.groupby(grouping_cols, as_index=False)
+	df_grouped = grouped.sum()
 
-# Calculates monthly standard deviation
-monthly_grouped['STD'] = df.groupby(['ID', 'YEAR', 'MONTH']).std().reset_index(0).reset_index(drop=True)['AMOUNT']
+	# Sorts dataframe
+	df_grouped = df_grouped.sort_values(grouping_cols, ascending=False)
 
-# Cleans final dataframe
-del monthly_grouped['DAY']
-del monthly_grouped['QUARTER']
+	# Calculates the difference in the means of two halfs of the grouping
+	df_grouped = pd.merge(df_grouped, grouped['GE'].apply(lambda x: mean(array(x)[len(array(x))/2:]) - mean(array(x)[:len(array(x))/2])).reset_index().rename(columns={0:'GE_RATE'}), on=grouping_cols)
+	df_grouped = pd.merge(df_grouped, grouped['GNV'].apply(lambda x: mean(array(x)[len(array(x))/2:]) - mean(array(x)[:len(array(x))/2])).reset_index().rename(columns={0:'GNV_RATE'}), on=grouping_cols)
+	df_grouped = pd.merge(df_grouped, grouped['GP'].apply(lambda x: mean(array(x)[len(array(x))/2:]) - mean(array(x)[:len(array(x))/2])).reset_index().rename(columns={0:'GP_RATE'}), on=grouping_cols)
+	df_grouped = pd.merge(df_grouped, grouped['DO'].apply(lambda x: mean(array(x)[len(array(x))/2:]) - mean(array(x)[:len(array(x))/2])).reset_index().rename(columns={0:'DO_RATE'}), on=grouping_cols)
 
-# Sorts dataframe
-monthly_grouped = monthly_grouped.sort_values(['ID', 'YEAR', 'MONTH'], ascending=False)
+	# Calculates monthly means
+	df_grouped = pd.merge(df_grouped, grouped[['GE', 'GNV', 'GP', 'DO']].mean().rename(columns={'GE':'GE_MEAN', 'GNV':'GNV_MEAN', 'GP':'GP_MEAN', 'DO':'DO_MEAN'}), on=grouping_cols)
 
+	# Calculates monthly standard deviation
+	grouped = df.groupby(grouping_cols)[['GE', 'GNV', 'GP', 'DO']].std().reset_index()
+	df_grouped = pd.merge(df_grouped, grouped.rename(columns={'GE':'GE_STD', 'GNV':'GNV_STD', 'GP':'GP_STD', 'DO':'DO_STD'}), on=grouping_cols)
 
-################################## QUARTERLY GROUPING ###################################
+	# Saves final file
+	print "Saving " + message + " analysis"
+	df_grouped.to_csv(output_file_path + message + "_analysis.csv", index=False, header=True)
 
-# Groups ID's fuel consuption by quarter
-quarterly_grouped = df.groupby(['ID', 'YEAR', 'QUARTER'], as_index=False).sum()
+	# Cleans final dataframe
+	columns_to_clean.remove(period)
+	for col in columns_to_clean:
+		del df_grouped[col]
+	columns_to_clean.append(period)
 
-# Calculates quarterly mean
-quarterly_grouped['MEAN'] = df.groupby(['ID', 'YEAR', 'QUARTER'], as_index=False).mean()['AMOUNT']
+	# Cleans auxiliar dataframes
+	del grouped
+	del df_grouped
 
-# Calculates quarterly standard deviation
-quarterly_grouped['STD'] = df.groupby(['ID', 'YEAR', 'QUARTER']).std().reset_index(0).reset_index(drop=True)['AMOUNT']
-
-# Cleans final dataframe
-del quarterly_grouped['DAY']
-del quarterly_grouped['MONTH']
-
-# Sorts dataframe
-quarterly_grouped = quarterly_grouped.sort_values(['ID', 'YEAR', 'QUARTER'], ascending=False)
-
-
-
-
-# Creates output folder path if it does not exists
-if not exists(output_file_path):
-	makedirs(output_file_path)
-
-file_end = "-normalized.csv" if f_normalize else ".csv"
-
-# Saves both generated dataframes into .csv files
-#monthly_grouped.to_csv(output_file_path+"monthly_grouped"+file_end, index=False, header=True)
-#quarterly_grouped.to_csv(output_file_path+"quartely_grouped"+file_end, index=False, header=True)
-
-#print monthly_grouped.head(30)
-print df.head(10)
-
-print "\nSuccessfully finished!"
+	print message.title() + " analysis sucessfully finished\n"
