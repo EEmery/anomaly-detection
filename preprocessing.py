@@ -100,15 +100,15 @@ for period, message in zip(periods, messages_to_print):
 	grouped = df.groupby(grouping_cols)[['GE', 'GNV', 'GP', 'DO']].std().reset_index()
 	df_grouped = pd.merge(df_grouped, grouped.rename(columns={'GE':'GE_STD', 'GNV':'GNV_STD', 'GP':'GP_STD', 'DO':'DO_STD'}), on=grouping_cols)
 
-	# Saves final file
-	print "Saving " + message + " analysis"
-	df_grouped.to_csv(output_file_path + message + "_analysis.csv", index=False, header=True)
-
 	# Cleans final dataframe
 	columns_to_clean.remove(period)
 	for col in columns_to_clean:
 		del df_grouped[col]
 	columns_to_clean.append(period)
+
+	# Saves final file
+	print "Saving " + message + " analysis"
+	df_grouped.to_csv(output_file_path + message + "_analysis.csv", index=False, header=True)
 
 	# Cleans auxiliar dataframes
 	del grouped
