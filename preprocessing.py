@@ -92,7 +92,7 @@ for period, message in zip(periods, messages_to_print):
 	df_grouped = grouped.sum()
 
 	# Add the car type of each ID
-	df_grouped = pd.merge(df_grouped, df_vehicles[['ID', 'TYPE']], on='ID')
+	df_grouped = pd.merge(df_grouped, df_vehicles[['ID', 'TYPE']], on='ID', how='left')
 
 	# Sorts dataframe
 	df_grouped = df_grouped.sort_values(grouping_cols, ascending=False)
