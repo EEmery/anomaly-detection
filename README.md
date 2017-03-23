@@ -38,6 +38,7 @@ The output `.csv` will have the following columns:
 **MONTH**: Month of refuel  
 **WEEK**: Quarter of refuel  
 **FREQUENCY**: Frequency of refuel (monthly or quarterly)  
+**TYPE**: Type of vehicle  
 **GE**: Special Fuel refueled amount (GASOLINAESPECIAL)  
 **GNV**: Natural Gas refueled amount (GASNATURALVEHICULAR)  
 **GP**: Premium Fuel refueled amount (GASOLINAPREMIUM)  
@@ -55,7 +56,20 @@ The output `.csv` will have the following columns:
 **GP_STD**: Standard deviation of refuel amount of fuel  
 **DO_STD**: Standard deviation of refuel amount of fuel  
 
-_Note: SEMESTER, QUARTER, MONTH and WEEK only appear in it's groupings._ 
+_Note: SEMESTER, QUARTER, MONTH and WEEK only appear in it's groupings._
+
+_Note: TYPE can be:_ 
+_AUTOMOVIL: 1_
+_CAMIONETA: 2_
+_JEEP: 3_
+_UNKOWN: 4_
+_VAGONETA: 5_
+_CAMION: 6_
+_OMNIBUS: 7_
+_MOTO: 8_
+_MINIBUS: 9_
+_MICROBUS: 10_
+_VOLQUETA: 11_
 
 ```
 USAGE:   $python preprocessing.py
