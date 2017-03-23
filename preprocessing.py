@@ -29,7 +29,8 @@ print "Starting preprocessing\n"
 
 # Reads the prompt passed arguments
 sys_input = sys.argv
-input_file_name = "Data/gas_stations-fixed.csv" if len(sys_input) < 2 else sys_input[1]
+input_file_name1 = "Data/gas_stations-fixed.csv" if len(sys_input) < 2 else sys_input[1]
+input_file_name2 = "Data/veiculos-fixed.csv"
 output_file_path = "Data/preprocessed/" if len(sys_input) < 3 else sys_input[2]
 
 # Sanitizes output path
@@ -41,7 +42,9 @@ if not exists(output_file_path):
 
 # Loads the data from the .csv file
 columns_names = ["CITY", "GAS_STATION", "ID", "FUEL_TYPE", "AMOUNT", "DAY", "MONTH", "YEAR"]
-df = pd.read_csv(input_file_name, names=columns_names)
+df = pd.read_csv(input_file_name1, names=columns_names)
+columns_names = ["CODE", "ID", "0", "TYPE", "BRAND", "COLOR", "CITY", "DAY", "MONTH", "YEAR"]
+df_vehicles = pd.read_csv(input_file_name2, names=columns_names)
 
 
 ####################### MAKES NECESSARY CHANGES IN THE DATA FRAME #######################
@@ -58,6 +61,10 @@ df['QUARTER'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']]).apply(lambda x: x.q
 
 # Creates a semester column
 df['SEMESTER'] = df['MONTH'].apply(lambda x: 1 if (x < 7) else 2)
+
+# Numeralizes the vehiculo type
+vehicles_types = list(df_vehicles['TYPE'].unique())
+df_vehicles['TYPE'] = df_vehicles['TYPE'].apply(lambda x: vehicles_types.index(x)+1)
 
 # Creates a frequency column
 df['FREQUENCY'] = 1
@@ -83,6 +90,9 @@ for period, message in zip(periods, messages_to_print):
 	grouping_cols = ['ID', 'YEAR'] + [period]
 	grouped = df.groupby(grouping_cols, as_index=False)
 	df_grouped = grouped.sum()
+
+	# Add the car type of each ID
+	df_grouped = pd.merge(df_grouped, df_vehicles[['ID', 'TYPE']], on='ID')
 
 	# Sorts dataframe
 	df_grouped = df_grouped.sort_values(grouping_cols, ascending=False)
