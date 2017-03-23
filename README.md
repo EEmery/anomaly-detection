@@ -58,18 +58,18 @@ The output `.csv` will have the following columns:
 
 _Note: SEMESTER, QUARTER, MONTH and WEEK only appear in it's groupings._
 
-_Note: TYPE can be:_ 
-_AUTOMOVIL: 1_
-_CAMIONETA: 2_
-_JEEP: 3_
-_UNKOWN: 4_
-_VAGONETA: 5_
-_CAMION: 6_
-_OMNIBUS: 7_
-_MOTO: 8_
-_MINIBUS: 9_
-_MICROBUS: 10_
-_VOLQUETA: 11_
+_Note: TYPE can be:_  
+_AUTOMOVIL: 1_  
+_CAMIONETA: 2_  
+_JEEP: 3_  
+_UNKOWN: 4_  
+_VAGONETA: 5_  
+_CAMION: 6_  
+_OMNIBUS: 7_  
+_MOTO: 8_  
+_MINIBUS: 9_  
+_MICROBUS: 10_  
+_VOLQUETA: 11_  
 
 ```
 USAGE:   $python preprocessing.py
