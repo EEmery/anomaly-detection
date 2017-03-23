@@ -25,44 +25,42 @@ FLAGS: --date (changes date format from DATE/DATE/DATE to DATE,DATE,DATE)
 
 #### preprocessing.py
 
-Generates two output files, `monthly_grouped.csv` and `quarterly_grouped.csv`. In the first one, data is grouped by month, in the second one, data is grouped by quarter. The input `.csv` file must have at least the following columns:
+Generates four output files, `weekly_analysis.csv`, `monthly_analysis.csv`, `quarterly_analysis.csv` and `semesterly_analysis.csv`. Each of them is grouped to respect to their periods. All refuel amounts in the output files are normalized in respect to the highest refueling in the whole input file (which must not be normalized). The input `.csv` file must have at least the following columns:
 
-ID | YEAR | MONTH | DAY | FUEL_TYPE | AMOUNT
+ID - YEAR - MONTH - DAY - FUEL_TYPE - AMOUNT
 
 The output `.csv` will have the following columns:
 
-* Monthly Grouped
-
-ID | YEAR | MONTH | FUEL_TYPE | AMOUNT | FREQUENCY | MEAN | STD
-
-* Quarterly Grouped
-
-ID | YEAR | QUARTER | FUEL_TYPE | AMOUNT | FREQUENCY | MEAN | STD
-
-Where:
-
 **ID**: License plate  
 **YEAR**: Year of refuel  
-**MONTH**: Month of refuel  
+**SEMESTER**: Quarter of refuel  
 **QUARTER**: Quarter of refuel  
-**FUEL_TYPE**: Fuel type  
-**AMOUNT**: Refuel amount  
+**MONTH**: Month of refuel  
+**WEEK**: Quarter of refuel  
 **FREQUENCY**: Frequency of refuel (monthly or quarterly)  
-**MEAN**: Mean of refuel amount (monthly or quarterly)  
-**STD**: Standard deviation of refuel amount (monthly or quarterly)  
+**GE**: Special Fuel refueled amount (GASOLINAESPECIAL)  
+**GNV**: Natural Gas refueled amount (GASNATURALVEHICULAR)  
+**GP**: Premium Fuel refueled amount (GASOLINAPREMIUM)  
+**DO**: Disel Oil refueled amount (DISELOIL)  
+**GE_RATE**: mean refuel amount difference between first and second halfes of period  
+**GNV_RATE**: mean refuel amount difference between first and second halfes of period  
+**GP_RATE**: mean refuel amount difference between first and second halfes of period  
+**DO_RATE**: mean refuel amount difference between first and second halfes of period  
+**GE_MEAN**: mean refuel amount of fuel  
+**GNV_MEAN**: mean refuel amount of fuel  
+**GP_MEAN**: mean refuel amount of fuel  
+**DO_MEAN**: mean refuel amount of fuel  
+**GE_STD**: Standard deviation of refuel amount of fuel  
+**GNV_STD**: Standard deviation of refuel amount of fuel  
+**GP_STD**: Standard deviation of refuel amount of fuel  
+**DO_STD**: Standard deviation of refuel amount of fuel  
 
-_Note: Fuel type can be:_  
-**GASOLINAESPECIAL**: 1  
-**GASNATURALVEHICULAR**: 2  
-**GASOLINAPREMIUM**: 3  
-**DIESELOIL**: 4  
-
-The program also offers an option to normalize the refuel amount (AMOUNT) with respect to the maximum refuel amount in the input `.csv` file (use `--norm`). The mean and standard deviation are calculated using the normalized values.
+_Note: SEMESTER, QUARTER, MONTH and WEEK only appear in it's groupings._ 
 
 ```
-USAGE:  $python preprocessing.py [input file name]
-OPTION: $python preprocessin.py [input file name] [output file path]
-FLAGS:  --norm (normalizes the fuel amount)
-```
+USAGE:   $python preprocessing.py
 
-_Note: If no output file path is specified, the files goes to `/output` folder (creates one if necessary)._
+OPTIONS: [input file name]
+         [output file path]
+         $python preprocessing.py [input file name] [output file path]
+```
