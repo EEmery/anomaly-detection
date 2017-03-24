@@ -1,2 +1,4 @@
 *.csv
 *.zip
+googleAPI-key.txt
+response.json
