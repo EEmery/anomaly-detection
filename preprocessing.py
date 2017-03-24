@@ -49,6 +49,16 @@ df_vehicles = pd.read_csv(input_file_name2, names=columns_names)
 
 ####################### MAKES NECESSARY CHANGES IN THE DATA FRAME #######################
 
+def codify_ID(ID):
+	ID = str(ID).upper()
+	codified_ID = [str(ord(char)) for char in ID ]
+	codified_ID = ['00']+codified_ID if len(codified_ID) <=6 else codified_ID
+	return ''.join(codified_ID)
+
+# Changes car ID's to a numeric coded system
+df['ID'] = df['ID'].apply(codify_ID)
+df_vehicles['ID'] = df_vehicles['ID'].apply(codify_ID)
+
 # Normalizes the fuel consuption
 max_amount = df['AMOUNT'].max()
 df['AMOUNT'] = df['AMOUNT']/max_amount
