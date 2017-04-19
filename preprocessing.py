@@ -56,12 +56,12 @@ def codify_ID(ID):
 	return ''.join(codified_ID)
 
 # Changes car ID's to a numeric coded system
-df['ID'] = df['ID'].apply(codify_ID)
-df_vehicles['ID'] = df_vehicles['ID'].apply(codify_ID)
+#df['ID'] = df['ID'].apply(codify_ID)
+#df_vehicles['ID'] = df_vehicles['ID'].apply(codify_ID)
 
 # Normalizes the fuel consuption
-max_amount = df['AMOUNT'].max()
-df['AMOUNT'] = df['AMOUNT']/max_amount
+#max_amount = df['AMOUNT'].max()
+#df['AMOUNT'] = df['AMOUNT']/max_amount
 
 # Creates a week column
 df['WEEK'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']]).apply(lambda x: x.week)
@@ -71,6 +71,9 @@ df['QUARTER'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']]).apply(lambda x: x.q
 
 # Creates a semester column
 df['SEMESTER'] = df['MONTH'].apply(lambda x: 1 if (x < 7) else 2)
+
+# Creates a day of year column
+df['DAY'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']]).apply(lambda x: x.dayofyear)
 
 # Numeralizes the vehiculo type
 vehicles_types = list(df_vehicles['TYPE'].unique())
@@ -88,8 +91,8 @@ df['DO'] = df['AMOUNT'].loc[df['FUEL_TYPE'] == 'DIESELOIL']
 
 ####################### PROCESS DATAFRAME IN RELATION TO PERIODS ########################
 
-periods = ['WEEK', 'MONTH', 'QUARTER', 'SEMESTER']
-messages_to_print = ['weekly', 'monthly', 'quarterly', 'semesterly']
+periods = ['DAY', 'WEEK', 'MONTH', 'QUARTER', 'SEMESTER']
+messages_to_print = ['daily', 'weekly', 'monthly', 'quarterly', 'semesterly']
 columns_to_clean = ['AMOUNT', 'DAY', 'WEEK', 'MONTH', 'QUARTER', 'SEMESTER']
 
 for period, message in zip(periods, messages_to_print):
