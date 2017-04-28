@@ -10,7 +10,8 @@ from warnings import filterwarnings
 filterwarnings("ignore")
 
 
-input_file_path = "Data/preprocessed_v2/not-normalized/"
+input_file_path = "Data/preprocessed/statistical_analysis/not-normalized/"
+output_file_path = "Data/preprocessed/frequency_analysis/"
 periods = ['DAY', 'WEEK', 'MONTH', 'QUARTER', 'SEMESTER'][::-1]
 periods_amounts = [365, 53, 12, 4, 2][::-1]
 file_names = ['daily', 'weekly', 'monthly', 'quarterly', 'semesterly'][::-1]
@@ -63,6 +64,10 @@ for period, period_amount, file_name in zip(periods, periods_amounts, file_names
 				result_df.set_value(ID, count, np.append(sum, freq))
 				count = 1
 		result_df.loc(axis=0)[ID][:'DO_MEAN'] = np.array(result_df.loc(axis=0)[ID][:'DO_MEAN'] / result_df.loc(axis=0)[ID, 'FREQUENCY'])
+
+	# Saves result dataframe
+	print "Saving " + file_name + " analysis\n"
+	result_df.to_csv(output_file_path + file_name + "_analysis.csv", index=False, header=True)
 			
 
 	# Show some data
@@ -70,13 +75,14 @@ for period, period_amount, file_name in zip(periods, periods_amounts, file_names
 		pass
 
 		#print periodic_analysis.head(10)
-		#print result_df.head(10)
+		#print result_df.head(30)
 
 		#periodic_analysis.loc['741NKH'].T.plot.bar()
 		#periodic_analysis.loc['4030PAF'].T.plot.bar()
 		#result_df.loc['741NKH'].T.plot.bar()
 		#result_df.loc['4030PAF'].T.plot.bar()
-		result_df.loc['1517YDG', :3].T.plot.bar()
+		#result_df.loc['1517YDG', :3].T.plot.bar()
+		#result_df.loc['1517YDG'].T.plot.bar()
 		#result_df.loc['1512KLC'].T.plot.bar()
 
-		plt.show()
+		#plt.show()
