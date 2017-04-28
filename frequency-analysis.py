@@ -67,7 +67,7 @@ for period, period_amount, file_name in zip(periods, periods_amounts, file_names
 
 	# Saves result dataframe
 	print "Saving " + file_name + " analysis\n"
-	result_df.to_csv(output_file_path + file_name + "_analysis.csv", index=False, header=True)
+	result_df.reset_index().rename(columns={'level_1':'FUEL_TYPE'}).to_csv(output_file_path + file_name + "_analysis.csv", index=False, header=True)
 			
 
 	# Show some data
