@@ -22,7 +22,7 @@ from numpy import mean, array
 # Filters warnings
 filterwarnings("ignore")
 
-print "Starting preprocessing\n"
+print "Starting statistical analysis\n"
 
 
 ########################## COMMAND PROMPT AND FILE PATHS SETUP ##########################
@@ -31,7 +31,7 @@ print "Starting preprocessing\n"
 sys_input = sys.argv
 input_file_name1 = "Data/gas_stations-fixed.csv" if len(sys_input) < 2 else sys_input[1]
 input_file_name2 = "Data/veiculos-fixed.csv"
-output_file_path = "Data/preprocessed/" if len(sys_input) < 3 else sys_input[2]
+output_file_path = "Data/preprocessed/statistical_analysis/" if len(sys_input) < 3 else sys_input[2]
 
 # Sanitizes output path
 output_file_path += "/" if (output_file_path[-1] == "/") else ""
@@ -60,8 +60,8 @@ def codify_ID(ID):
 #df_vehicles['ID'] = df_vehicles['ID'].apply(codify_ID)
 
 # Normalizes the fuel consuption
-#max_amount = df['AMOUNT'].max()
-#df['AMOUNT'] = df['AMOUNT']/max_amount
+max_amount = df['AMOUNT'].max()
+df['AMOUNT'] = df['AMOUNT']/max_amount
 
 # Creates a week column
 df['WEEK'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']]).apply(lambda x: x.week)
