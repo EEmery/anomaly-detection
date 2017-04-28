@@ -29,8 +29,8 @@ print "Starting statistical analysis\n"
 
 # Reads the prompt passed arguments
 sys_input = sys.argv
-input_file_name1 = "Data/gas_stations-fixed.csv" if len(sys_input) < 2 else sys_input[1]
-input_file_name2 = "Data/veiculos-fixed.csv"
+input_file_name1 = "Data/sanitized/gas_stations-fixed.csv" if len(sys_input) < 2 else sys_input[1]
+input_file_name2 = "Data/sanitized/veiculos-fixed.csv"
 output_file_path = "Data/preprocessed/statistical_analysis/" if len(sys_input) < 3 else sys_input[2]
 
 # Sanitizes output path
