@@ -1,14 +1,14 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 from mvpa2.suite import *
-#from scipy.cluster.vq import kmeans, vq
 
 
-########################### DATA EXTRACTION AND PREPARATION #############################
+# Imports data
+data = pd.read_csv("Data/preprocessed/frequency_analysis/daily_analysis.csv")
 
-data = pd.read_csv("Data/preprocessed/frequency_analysis/semesterly_analysis.csv")
-
+# Gets data
 ids = data['ID'].unique()
 consuption = data.ix[:, 2:].fillna(0).as_matrix()
 
@@ -22,59 +22,56 @@ consuption = consuption.reshape((len(ids), 4*len(consuption[0])))
 len_consuption = len(consuption)
 
 
-############################ SELF ORGANIZED MAPS TRAININGS ##############################
+bins_list = [20, 30, 40, 50]
+k_folds_list = [2, 3, 4]
 
-bins = 50
-slice_size = int(len_consuption/4)
+for k_folds in k_folds_list:
+	for bins in bins_list:
 
-# Trains Self Organizing Maps (SOM) 1
-print "Training self organizing map 1 with " + str(bins) + "x" + str(bins) + " lattice"
-som1 = SimpleSOMMapper((bins, bins), len_consuption, learning_rate=0.01)
-som1.train(np.copy(consuption[:slice_size]))
+		print "\n\nAnalysing Self-Oraganized Maps with " + str(k_folds) + " folds and " + str(bins) + " by " + str(bins) + " lattice"
+		slice_size = int(len_consuption/k_folds)
 
-# Trains Self Organizing Maps (SOM) 2
-print "Training self organizing map 2 with " + str(bins) + "x" + str(bins) + " lattice"
-som2 = SimpleSOMMapper((bins, bins), len_consuption, learning_rate=0.01)
-som2.train(np.copy(consuption[slice_size:slice_size*2]))
-
-# Trains Self Organizing Maps (SOM) 3
-print "Training self organizing map 3 with " + str(bins) + "x" + str(bins) + " lattice"
-som3 = SimpleSOMMapper((bins, bins), len_consuption, learning_rate=0.01)
-som3.train(np.copy(consuption[slice_size*2:slice_size*3]))
-
-# Trains Self Organizing Maps (SOM) 4
-print "Training self organizing map 4 with " + str(bins) + "x" + str(bins) + " lattice"
-som4 = SimpleSOMMapper((bins, bins), len_consuption, learning_rate=0.01)
-som4.train(np.copy(consuption[slice_size*3:slice_size*4]))
+		# Trains Self Organizing Maps
+		som_list = []
+		for i in range(k_folds):
+			print "Training self organized map " + str(i)
+			som_list.append(SimpleSOMMapper((bins, bins), slice_size*2, learning_rate=0.05))
+			som_list[-1].train(np.copy(consuption[slice_size*i : slice_size*(i+1)]))
 
 
-############################# SELF ORGANIZED MAPS MAPPING ###############################
-
-# Maps data with the trained SOM
-print "Mapping data with created self organizing map"
-
-mapped = [som1(consuption), som2(consuption), som3(consuption), som4(consuption)]
-
-for i, mapped in enumerate(mapped):
-	print "Map: " + str(i)
-
-	# Creates and saves a dataframe with the generated map results
-	print "Saving result of " + str(bins) + "x" + str(bins) + " lattice in a .csv"
-	mapped_df = pd.DataFrame({'ID':ids, 'X':mapped[:,0], 'Y':mapped[:,1]})
-	mapped_df.to_csv("Data/mapped_folded/som_" + str(i) + "_mapped_" + str(bins) + "x" + str(bins) +  "_lattice.csv", index=False, header=True)
-
-	# Save heatmap of data
-	print "Saving result of " + str(bins) + "x" + str(bins) + " lattice in a .png as a heatmap"
-	heatmap, xedges, yedges = np.histogram2d(mapped[:,0], mapped[:,1], bins)
-	extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-	plt.clf()
-	plt.imshow(heatmap.T, extent=extent, origin='lower')
-	plt.colorbar()
-	plt.savefig("Data/mapped_folded/heatmap_" + str(i) + "_" + str(bins) + "x" + str(bins) + "_lattice.png", bbox_inches='tight')
+		# Maps data with the trained SOM
+		mapped = []
+		for i, som in enumerate(som_list):
+			print "Mapping data with self-organized map " + str(i)
+			mapped.append(som(consuption))
 
 
-	# Save ploted data
-	print "Saving result of " + str(bins) + "x" + str(bins) + " lattice in a .png as a plot\n"
-	plt.clf()
-	plt.plot(mapped[:,0], mapped[:,1], 'bo')
-	plt.savefig("Data/mapped_folded/plot_" + str(i) + "_" + str(bins) + "x" + str(bins) + "_lattice.png", bbox_inches='tight')
+		# Saves results
+		for i, mapped in enumerate(mapped):
+			print "\nSaving results of map " + str(i)
+
+			# Creates a folder with it does not exists
+			output_file_path = "Data/mapped_folded/" + str(k_folds) + "_folds/latice_" + str(bins) + "x" + str(bins) + "/"
+			if not os.path.exists(output_file_path):
+				os.makedirs(output_file_path)
+
+			# Creates and saves a dataframe with the generated map results
+			print "Saving result of " + str(bins) + "x" + str(bins) + " lattice in a .csv"
+			mapped_df = pd.DataFrame({'ID':ids, 'X':mapped[:,0], 'Y':mapped[:,1]})
+			mapped_df.to_csv(output_file_path + "som_" + str(i) + "_mapped_" + str(bins) + "x" + str(bins) +  "_lattice.csv", index=False, header=True)
+
+			# Save heatmap of data
+			print "Saving result of " + str(bins) + "x" + str(bins) + " lattice in a .png as a heatmap"
+			heatmap, xedges, yedges = np.histogram2d(mapped[:,0], mapped[:,1], bins)
+			extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+			plt.clf()
+			plt.imshow(heatmap.T, extent=extent, origin='lower')
+			plt.colorbar()
+			plt.savefig(output_file_path + "heatmap_" + str(i) + "_" + str(bins) + "x" + str(bins) + "_lattice.png", bbox_inches='tight')
+
+
+			# Save ploted data
+			print "Saving result of " + str(bins) + "x" + str(bins) + " lattice in a .png as a plot\n"
+			plt.clf()
+			plt.plot(mapped[:,0], mapped[:,1], 'bo')
+			plt.savefig(output_file_path + "plot_" + str(i) + "_" + str(bins) + "x" + str(bins) + "_lattice.png", bbox_inches='tight')
