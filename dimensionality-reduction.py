@@ -6,19 +6,20 @@ from mvpa2.suite import *
 
 
 # Imports data
-data = pd.read_csv("Data/preprocessed/frequency_analysis/daily_analysis.csv")
+#data = pd.read_csv("Data/preprocessed/frequency_analysis/daily_analysis.csv")
+data = pd.read_csv("Data/preprocessed/behavorial_analysis/behavorial-analysis.csv")
 
 # Gets data
 ids = data['ID'].unique()
 consuption = data.ix[:, 2:].fillna(0).as_matrix()
 
 # Removes the frequency rows
-len_consuption = len(consuption)
-mask = np.array([i in xrange(4, len_consuption, 5) for i in xrange(len_consuption)])
-consuption = consuption[~mask]
+#len_consuption = len(consuption)
+#mask = np.array([i in xrange(4, len_consuption, 5) for i in xrange(len_consuption)])
+#consuption = consuption[~mask]
 
 # Reshapes consuption data
-consuption = consuption.reshape((len(ids), 4*len(consuption[0])))
+#consuption = consuption.reshape((len(ids), 4*len(consuption[0])))
 len_consuption = len(consuption)
 
 
@@ -51,7 +52,7 @@ for k_folds in k_folds_list:
 			print "\nSaving results of map " + str(i)
 
 			# Creates a folder with it does not exists
-			output_file_path = "Data/mapped_folded/" + str(k_folds) + "_folds/latice_" + str(bins) + "x" + str(bins) + "/"
+			output_file_path = "Data/mapped_folded/behavorial_data/" + str(k_folds) + "_folds/lattice_" + str(bins) + "x" + str(bins) + "/"
 			if not os.path.exists(output_file_path):
 				os.makedirs(output_file_path)
 
