@@ -3,13 +3,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.cluster.vq import kmeans, vq
+from warnings import filterwarnings
 
-k_folds = 4
+# Filters warnings
+filterwarnings("ignore")
+
+k_folds = 2
 k_means = 4
 bins = 50
 
-os_path = os.getcwd().replace('\\', '/') + '/'																			# Gets the actual folder path
-path = "Data/mapped_folded/semesterly_data/" + str(k_folds) + "_folds/lattice_" + str(bins) + "x" + str(bins) +"/"		# Refers to data path
+path = "Data/mapped_folded/behavorial_data/" + str(k_folds) + "_folds/lattice_" + str(bins) + "x" + str(bins) +"/"		# Refers to data path
+#os_path = os.getcwd().replace('\\', '/') + '/'																			# Gets the actual folder path
 #os.listdir(os_path + path)																								# Gets a list of all files in folder
 
 
@@ -42,7 +46,7 @@ for cluster_num in range(k_means):															# Iterates over global cluster
 	for map_num, cluster_idx in enumerate(bm_cluster[cluster_num]):
 		condition = (condition & (df["MAP_" + str(map_num+1)] == cluster_idx))
 		total += len(df[df["MAP_" + str(map_num+1)] == cluster_idx])
-	print "Cluster " + str(cluster_num) + ": " + str(len(df[condition])) + " similar ID's from " + str(total/4.0) + " ID's in cluster " + str(len(df[condition]) / (total/4.0))
+	print "Cluster " + str(cluster_num) + ": " + str(len(df[condition])) + " similar ID's from " + str(total/k_folds) + " ID's in cluster " + str(len(df[condition]) / float(total/k_folds))
 	output['CLUSTER'][condition] = cluster_num
 
-output.to_csv(path+"k_folds-validation-output.csv", index=False, header=True)				# Saves result dataframe
+output.to_csv(path+"clusterization-output.csv", index=False, header=True)				# Saves result dataframe
