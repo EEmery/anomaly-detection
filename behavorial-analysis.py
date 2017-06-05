@@ -28,9 +28,9 @@ output = pd.merge(output, tmp, on='ID')														# Puts monthly refuel STD t
 
 ###################################### FREQUENCY ########################################
 
-time_interval_analysis = pd.read_csv('Data/preprocessed/time_interval_analysis/time_interval_analysis.csv')
+time_interval_analysis = pd.read_csv('Data/preprocessed/time_interval_analysis/time_interval_analysis.csv').fillna(0)
 
-tmp = time_interval_analysis[['ID', 'INTERVAL']].groupby('ID').min().reset_index().rename(columns={'INTERVAL':'MAX_INTERVAL'})
+tmp = time_interval_analysis.groupby('ID', group_keys=False).apply(lambda x: x.ix[x.INTERVAL.idxmin()])[['ID', 'GE_R', 'GNV_R', 'GP_R', 'DO_R']]
 output = pd.merge(output, tmp, on='ID')														# Puts highest time interval to output
 
 tmp = time_interval_analysis[['ID', 'INTERVAL']].groupby('ID').std().reset_index().rename(columns={'INTERVAL':'INTERVAL_STD'})
