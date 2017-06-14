@@ -36,7 +36,7 @@ for k_folds in k_folds_list:
 		som_list = []
 		for i in range(k_folds):
 			print "Training self organized map " + str(i)
-			som_list.append(SimpleSOMMapper((bins, bins), slice_size*2, learning_rate=0.05))
+			som_list.append(SimpleSOMMapper((bins, bins), len_consuption, learning_rate=0.05))
 			som_list[-1].train(np.copy(consuption[slice_size*i : slice_size*(i+1)]))
 
 
