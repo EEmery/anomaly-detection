@@ -19,6 +19,9 @@ statistical_analysis = pd.read_csv('Data/preprocessed/statistical_analysis/not-n
 statistical_analysis = statistical_analysis.sort_values('ID', ascending=False)
 output['ID'] = statistical_analysis['ID'].unique()											# Puts ID's to output
 
+tmp = statistical_analysis[['ID', 'TYPE']].groupby('ID').first().reset_index()
+output = pd.merge(output, tmp, on='ID')
+
 tmp = statistical_analysis[['ID', 'GE', 'GNV', 'GP', 'DO']].groupby('ID').mean().reset_index()
 output = pd.merge(output, tmp, on='ID')														# Puts monthly refuel mean to output
 
@@ -70,4 +73,21 @@ tmp = raw_data.groupby('ID', as_index=False).sum()[consuption_locations].as_matr
 output['MAX_LOCATION'] = tmp.argmax(axis=1)													# Puts most registered fuel to output
 output['LOCATION_STD'] = tmp.std(axis=1)													# Puts fuel type STD to output
 
+
+################################## NORMALIZES COLUMNS ###################################
+
+output = output.set_index('ID')
+
+# Normalises globaly
+mask1 = ['TYPE', 'INTERVAL_STD', 'MAX_FUEL_TYPE', 'FUEL_TYPE_STD', 'MAX_LOCATION', 'LOCATION_STD']
+tmp_output_1 = output.ix[:, mask1] / output.ix[:, mask1].max()
+
+# Normalises localy
+mask2 = ['GE', 'GNV', 'GP', 'DO', 'GE_STD', 'GNV_STD', 'GP_STD', 'DO_STD', 'GE_R', 'GNV_R', 'GP_R', 'DO_R']
+tmp_output_2 = output.groupby('TYPE')[mask2].apply(lambda x: x/x.max())
+
+# Merges normalysed outputs
+output = pd.merge(tmp_output_1, tmp_output_2, left_index=True, right_index=True).reset_index()
+
+output = output.sample(n=len(output))
 output.to_csv("Data/preprocessed/behavorial_analysis/behavorial-analysis.csv", index=False, header=True)
