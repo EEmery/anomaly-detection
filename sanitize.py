@@ -27,11 +27,25 @@ def fix_csv_file(input_file_name, output_file_name, fix_date, fix_NaN):
 	
 	for line in input_file:
 		# Replaces semicolon for comas
-		fixed_line = line.replace(";", ",")
+		fixed_line = line.replace(",", ".")
+		fixed_line = fixed_line.replace(";", ",")
 
 		# Changes date from "DATE/DATE/DATE" to "DATE,DATE,DATE"
 		if fix_date:
-			fixed_line = fixed_line.replace("/", ",")	
+			fixed_line = fixed_line.replace("/", "-")
+			fixed_line = fixed_line.replace("a.m.", "AM")
+			fixed_line = fixed_line.replace("p.m.", "PM")
+			#fixed_line = fixed_line.replace(",,", ",")
+			#fixed_line = fixed_line.replace(", Bolivia", "")
+			#fixed_line = fixed_line.replace(",76907,", ",")
+			#if ',271124023,' in fixed_line:
+			#	ind = fixed_line.find('271124023,')
+			#	fixed_line = fixed_line[:ind] + fixed_line[ind:].replace(fixed_line[:ind][-9:], ',')
+			#	print fixed_line[ind:]
+			if fixed_line[-2] != 'M' and fixed_line[-1] != '\0':
+				fixed_line = fixed_line[:-1] + " 01:00:00 AM\n"
+			if fixed_line[-3] != 'M' and fixed_line[-1] == '\0':
+				fixed_line = fixed_line[:-1] + " 00:00:00 AM\n\0"
 
 		# Fixes last comma problem
 		if fix_NaN:
